@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+{% include head.html %}
+<body>
+<main class="container-fluid vm-{{ page.mainClass }}">
+<div class="row">
+<div class="col">
+{{ content }}
+</div>
+</div>
+</main>
+</body>
+</html>
