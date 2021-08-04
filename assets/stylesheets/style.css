@@ -30,6 +30,9 @@ ul, ol {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent; }
 .vm-fc210807 .rotate {
-  transform: rotate(180deg) scaleX(-1); }
+  transform: rotate(180deg) scaleX(-1);
+  background: -webkit-linear-gradient(#ff4a6b, #ff3d00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; }
 
 /*# sourceMappingURL=style.css.map */
