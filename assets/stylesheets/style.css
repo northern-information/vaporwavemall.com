@@ -36,4 +36,42 @@ ul, ol {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent; }
 
+/* fc210710 */
+.vm-fc210710 {
+  background: #1A1A1A; }
+  .vm-fc210710 .cell[data-toggle='0'] {
+    color: #1A1A1A; }
+  .vm-fc210710 .cell[data-toggle='1'] {
+    color: #f7931e; }
+  .vm-fc210710 p {
+    color: #cccccc;
+    width: 100%; }
+
+#life {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 1rem auto;
+  display: block;
+  z-index: -1;
+  position: relative; }
+
+.cell {
+  font-size: 64px;
+  line-height: 0px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  float: left; }
+
+.cell-row {
+  height: 20px; }
+
+#next {
+  display: none; }
+
+#ui {
+  font-family: monospace;
+  text-align: center; }
+
 /*# sourceMappingURL=style.css.map */
