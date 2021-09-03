@@ -22,6 +22,14 @@ ul, ol {
   .ni-wrap:hover .ni {
     fill: #007bff; }
 
+/* fc210904 */
+.vm-fc210904 {
+  background: transparent;
+  color: #000000; }
+  .vm-fc210904 h1 {
+    font-size: 50px;
+    font-family: "IBM Plex Mono", monospace; }
+
 /* fc210807 */
 .vm-fc210807 h1 {
   font-size: 100px;
