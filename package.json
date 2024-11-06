@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "dev": "bundle exec jekyll serve --baseurl '' --livereload",
+    "scss": "sass --watch assets/stylesheets/style.scss:assets/stylesheets/style.css",
+    "css": "npx tailwindcss -i ./assets/stylesheets/style.scss -o ./assets/stylesheets/style.css --watch",
+    "build": "./build.sh",
+    "discography": "npm install @tyleretters/discography@latest && cp ./node_modules/@tyleretters/discography/dist/discography.yml _data/discography.yml"
+  },
+  "dependencies": {
+    "@tyleretters/discography": "^1.0.3",
+    "tailwind": "^4.0.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.14"
+  }
+}
