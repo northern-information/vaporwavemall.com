@@ -1,0 +1,8 @@
+**/.git
+.vscode
+dist
+package-lock.json
+node_modules
+src/assets/images
+src/assets/javascript
+src/assets/stylesheets/style.built.css

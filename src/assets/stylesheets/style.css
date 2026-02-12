@@ -1,0 +1,261 @@
+@import "tailwindcss";
+@source "../../../../src";
+
+/* global */
+
+@theme {
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-bootstrap-blue: #007bff;
+}
+
+body,
+code,
+pre {
+  background: var(--color-black);
+  color: var(--color-white);
+  font-family:
+    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* home */
+
+.ni-wrap {
+  width: 50px;
+
+  & .ni {
+    fill: var(--color-white);
+  }
+
+  &:hover .ni {
+    fill: var(--color-bootstrap-blue);
+  }
+}
+
+/* fc210904 */
+
+.vm-fc210904 {
+  background: transparent;
+  color: var(--color-black);
+
+  & h1 {
+    font-size: 50px;
+    font-family: "IBM Plex Mono", monospace;
+  }
+}
+
+/* fc210807 */
+
+.vm-fc210807 {
+  & h1 {
+    font-size: 100px;
+    font-family: "IBM Plex Mono", monospace;
+    background: -webkit-linear-gradient(#ff3d00, #ff4a6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  & .rotate {
+    margin-top: 4px;
+    transform: rotate(180deg) scaleX(-1);
+    background: -webkit-linear-gradient(#ff4a6b, #ff3d00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* fc210710 */
+
+.vm-fc210710 {
+  background: #1a1a1a;
+
+  & .cell[data-toggle="0"] {
+    color: #1a1a1a;
+  }
+
+  & .cell[data-toggle="1"] {
+    color: #f7931e;
+  }
+
+  & p {
+    color: #cccccc;
+    width: 100%;
+  }
+}
+
+#life {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 1rem auto;
+  display: block;
+  z-index: -1;
+  position: relative;
+}
+
+.cell {
+  font-size: 64px;
+  line-height: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  float: left;
+}
+
+.cell-row {
+  height: 20px;
+}
+
+#next {
+  display: none;
+}
+
+#ui {
+  font-family: monospace;
+  text-align: center;
+}
+
+/* this-had-better-be-part-of-some-grand-occult-process */
+
+.this-had-better-be-part-of-some-grand-occult-process {
+  background: url("/assets/images/this-had-better-be-part-of-some-grand-occult-process-bg.jpg")
+    top left no-repeat;
+}
+
+.occult-container {
+  overflow: hidden;
+  width: 100%;
+  height: auto;
+}
+
+/* Base styling for all animated images */
+.animated-image {
+  position: absolute;
+  top: var(--ai-top);
+  left: var(--ai-left);
+  z-index: var(--ai-z);
+  transform: scale(var(--ai-scale));
+  animation:
+    var(--ai-direction) var(--ai-duration) linear infinite,
+    fadeInOut 90s ease-in-out infinite;
+}
+
+.animated-image-1 {
+  --ai-top: 0;
+  --ai-left: 0;
+  --ai-z: 1;
+  --ai-scale: 1;
+  --ai-direction: moveLeftToRight;
+  --ai-duration: 60s;
+}
+.animated-image-2 {
+  --ai-top: 40px;
+  --ai-left: 100px;
+  --ai-z: 2;
+  --ai-scale: 1.2;
+  --ai-direction: moveRightToLeft;
+  --ai-duration: 65s;
+}
+.animated-image-3 {
+  --ai-top: 80px;
+  --ai-left: 200px;
+  --ai-z: 3;
+  --ai-scale: 1.1;
+  --ai-direction: moveLeftToRight;
+  --ai-duration: 70s;
+}
+.animated-image-4 {
+  --ai-top: 120px;
+  --ai-left: 300px;
+  --ai-z: 4;
+  --ai-scale: 1.3;
+  --ai-direction: moveRightToLeft;
+  --ai-duration: 75s;
+}
+.animated-image-5 {
+  --ai-top: 160px;
+  --ai-left: 400px;
+  --ai-z: 5;
+  --ai-scale: 0.9;
+  --ai-direction: moveLeftToRight;
+  --ai-duration: 80s;
+}
+.animated-image-6 {
+  --ai-top: 200px;
+  --ai-left: 500px;
+  --ai-z: 6;
+  --ai-scale: 1.4;
+  --ai-direction: moveRightToLeft;
+  --ai-duration: 85s;
+}
+.animated-image-7 {
+  --ai-top: 240px;
+  --ai-left: 600px;
+  --ai-z: 7;
+  --ai-scale: 1.05;
+  --ai-direction: moveLeftToRight;
+  --ai-duration: 90s;
+}
+.animated-image-8 {
+  --ai-top: 280px;
+  --ai-left: 700px;
+  --ai-z: 8;
+  --ai-scale: 0.8;
+  --ai-direction: moveRightToLeft;
+  --ai-duration: 95s;
+}
+
+/* Keyframes for moving left to right */
+@keyframes moveLeftToRight {
+  0% {
+    transform: translateX(-100%) scale(1);
+  }
+  100% {
+    transform: translateX(100%) scale(1);
+  }
+}
+
+/* Keyframes for moving right to left */
+@keyframes moveRightToLeft {
+  0% {
+    transform: translateX(100%) scale(1);
+  }
+  100% {
+    transform: translateX(-100%) scale(1);
+  }
+}
+
+/* Keyframes for opacity animation */
+@keyframes fadeInOut {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.fade-out {
+  opacity: 1;
+  transition: opacity 2s ease;
+  animation: fadeAfter10s 12s forwards;
+}
+
+@keyframes fadeAfter10s {
+  0%,
+  33.33% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

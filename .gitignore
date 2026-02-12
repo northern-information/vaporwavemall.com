@@ -1,7 +1,7 @@
-_site
-.sass-cache
-.jekyll-cache
-.jekyll-metadata
-vendor
+dist
 .DS_Store
 node_modules
+.claude
+.sass-cache
+src/assets/javascript
+src/assets/stylesheets/style.built.css

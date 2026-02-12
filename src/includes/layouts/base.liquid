@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="{{ lang | default: site.lang | default: 'en' }}">
+{% include "head.liquid" %}
+<body{% if pageClass %} class="{{ pageClass }}"{% endif %}>
+{{ content }}
+{% if jsFile %}
+<script type="module" src="/assets/javascript/{{ jsFile }}?{{ "" | cacheBust }}"></script>
+{% endif %}
+</body>
+</html>
