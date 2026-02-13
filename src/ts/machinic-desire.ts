@@ -3,6 +3,16 @@ import { GameOfLife } from "./lib/game-of-life.js";
 const GRID_SIZE = 150;
 const STEP_MS = 150;
 const IMAGE_COUNT = 16;
+const LUMINANCE_THRESHOLD = 120;
+
+// Fixed 4-color palette shared across all machinic desire images
+// Sorted dark to light: [darkest, dark, light, lightest]
+const PALETTE: [number, number, number][] = [
+  [26, 10, 46],
+  [74, 42, 110],
+  [200, 168, 232],
+  [255, 255, 255],
+];
 
 const luminance = (r: number, g: number, b: number): number =>
   0.299 * r + 0.587 * g + 0.114 * b;
@@ -15,46 +25,11 @@ const loadImage = (src: string): Promise<HTMLImageElement> =>
     img.src = src;
   });
 
-const extractPalette = (
-  imageData: ImageData,
-): [number, number, number, number][] => {
-  const colorCounts = new Map<
-    string,
-    { r: number; g: number; b: number; count: number }
-  >();
-  const data = imageData.data;
-
-  for (let i = 0; i < data.length; i += 4) {
-    const r = Math.round(data[i] / 32) * 32;
-    const g = Math.round(data[i + 1] / 32) * 32;
-    const b = Math.round(data[i + 2] / 32) * 32;
-    const key = `${r},${g},${b}`;
-
-    const existing = colorCounts.get(key);
-    if (existing) {
-      existing.count++;
-    } else {
-      colorCounts.set(key, { r, g, b, count: 1 });
-    }
-  }
-
-  return [...colorCounts.values()]
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 4)
-    .sort((a, b) => luminance(a.r, a.g, a.b) - luminance(b.r, b.g, b.b))
-    .map((c) => [c.r, c.g, c.b, 255] as [number, number, number, number]);
-};
-
-const nearestColorIndex = (
-  r: number,
-  g: number,
-  b: number,
-  palette: [number, number, number, number][],
-): number => {
+const nearestColorIndex = (r: number, g: number, b: number): number => {
   let minDist = Infinity;
   let idx = 0;
-  for (let i = 0; i < palette.length; i++) {
-    const [pr, pg, pb] = palette[i];
+  for (let i = 0; i < PALETTE.length; i++) {
+    const [pr, pg, pb] = PALETTE[i];
     const dist = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2;
     if (dist < minDist) {
       minDist = dist;
@@ -92,9 +67,6 @@ const startLife = async (imageIndex: number) => {
   offCtx.drawImage(img, 0, 0, GRID_SIZE, GRID_SIZE);
   const imageData = offCtx.getImageData(0, 0, GRID_SIZE, GRID_SIZE);
 
-  // Extract 4-color palette sorted dark to light
-  const palette = extractPalette(imageData);
-
   // Map each pixel to a color index and initialize Game of Life
   const colorIndices = new Uint8Array(GRID_SIZE * GRID_SIZE);
   const game = new GameOfLife(GRID_SIZE, GRID_SIZE);
@@ -105,10 +77,9 @@ const startLife = async (imageIndex: number) => {
       const r = imageData.data[i];
       const g = imageData.data[i + 1];
       const b = imageData.data[i + 2];
-      const idx = nearestColorIndex(r, g, b, palette);
-      colorIndices[y * GRID_SIZE + x] = idx;
-      // Lighter two colors (indices 2, 3) are alive
-      game.setCell(x, y, idx >= 2);
+      colorIndices[y * GRID_SIZE + x] = nearestColorIndex(r, g, b);
+      // Classify alive/dead by luminance, not palette position
+      game.setCell(x, y, luminance(r, g, b) > LUMINANCE_THRESHOLD);
     }
   }
 
@@ -129,12 +100,12 @@ const startLife = async (imageIndex: number) => {
         renderIdx = ci < 2 ? ci : ci - 2;
       }
 
-      const color = palette[renderIdx];
+      const color = PALETTE[renderIdx];
       const i = (y * GRID_SIZE + x) * 4;
       imgData.data[i] = color[0];
       imgData.data[i + 1] = color[1];
       imgData.data[i + 2] = color[2];
-      imgData.data[i + 3] = color[3];
+      imgData.data[i + 3] = 255;
     });
     ctx.putImageData(imgData, 0, 0);
     genEl.textContent = String(game.getGeneration());
