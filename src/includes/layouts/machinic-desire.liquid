@@ -3,6 +3,10 @@ layout: base.liquid
 ---
 <main class="md-layout">
   <aside class="md-sidebar">
+    <div class="md-tabs">
+      <button id="tab-v1" class="md-tab md-tab-active">v1</button>
+      <button id="tab-v2" class="md-tab">v2</button>
+    </div>
     <div class="md-controls">
       <button id="play-pause" class="md-play-pause" aria-label="Play/Pause">
         <svg id="icon-play" viewBox="0 0 24 24" width="24" height="24"><polygon points="5,3 19,12 5,21"/></svg>
@@ -12,6 +16,8 @@ layout: base.liquid
     </div>
     <input type="range" id="scrubber" min="0" max="0" value="0">
     <div id="image-selector"></div>
+    <p id="desc-v1" class="md-desc">one game of life. light pixels are alive, dark pixels are dead. all four colors share a single simulation.</p>
+    <p id="desc-v2" class="md-desc" style="display:none">four independent games of life, one per color. dead cells are transparent. lightest color layered on top, darkest on bottom.</p>
   </aside>
   <div class="md-canvas-wrap">
     <canvas id="machinic-canvas"></canvas>

@@ -145,6 +145,43 @@ ol {
   gap: 0.75rem;
 }
 
+.md-tabs {
+  display: flex;
+}
+
+.md-tab {
+  flex: 1;
+  background: none;
+  border: 1px solid #4a2a6e;
+  color: #888888;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 14px;
+
+  &:first-child {
+    border-radius: 4px 0 0 4px;
+  }
+
+  &:last-child {
+    border-radius: 0 4px 4px 0;
+  }
+
+  &:hover {
+    color: #c8a8e8;
+  }
+}
+
+.md-tab-active {
+  background: #4a2a6e;
+  color: #ffffff;
+  border-color: #4a2a6e;
+
+  &:hover {
+    color: #ffffff;
+  }
+}
+
 .md-controls {
   display: flex;
   align-items: center;
@@ -186,6 +223,13 @@ ol {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
+}
+
+.md-desc {
+  color: #888888;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
 }
 
 .md-canvas-wrap {

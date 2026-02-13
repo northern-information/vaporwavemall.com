@@ -15,6 +15,9 @@ const PALETTE: [number, number, number][] = [
   [255, 255, 255],
 ];
 
+// Background color (matches .vm-machinic-desire background: #0a0010)
+const BG_COLOR: [number, number, number] = [10, 0, 16];
+
 const luminance = (r: number, g: number, b: number): number =>
   0.299 * r + 0.587 * g + 0.114 * b;
 
@@ -47,6 +50,8 @@ let ctx: CanvasRenderingContext2D | null = null;
 let genEl: HTMLElement | null = null;
 let scrubber: HTMLInputElement | null = null;
 let playing = false;
+let currentVersion: 1 | 2 = 1;
+let currentImageIndex = 0;
 
 const iconPlay = document.getElementById("icon-play") as HTMLElement | null;
 const iconPause = document.getElementById("icon-pause") as HTMLElement | null;
@@ -61,7 +66,9 @@ const showPauseIcon = () => {
   if (iconPause) iconPause.style.display = "";
 };
 
-const renderGeneration = (gen: number) => {
+// --- Rendering ---
+
+const renderGenerationV1 = (gen: number) => {
   if (!ctx || !genEl || !snapshots[gen]) return;
   const snap = snapshots[gen];
   const imgData = ctx.createImageData(GRID_SIZE, GRID_SIZE);
@@ -76,6 +83,44 @@ const renderGeneration = (gen: number) => {
   ctx.putImageData(imgData, 0, 0);
   genEl.textContent = String(gen);
 };
+
+const renderGenerationV2 = (gen: number) => {
+  if (!ctx || !genEl || !snapshots[gen]) return;
+  const snap = snapshots[gen];
+  const imgData = ctx.createImageData(GRID_SIZE, GRID_SIZE);
+  for (let pos = 0; pos < GRID_SIZE * GRID_SIZE; pos++) {
+    const mask = snap[pos];
+    const i = pos * 4;
+    // Check from lightest (bit 3) to darkest (bit 0), first alive wins
+    let found = false;
+    for (let c = 3; c >= 0; c--) {
+      if (mask & (1 << c)) {
+        const color = PALETTE[c];
+        imgData.data[i] = color[0];
+        imgData.data[i + 1] = color[1];
+        imgData.data[i + 2] = color[2];
+        imgData.data[i + 3] = 255;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      imgData.data[i] = BG_COLOR[0];
+      imgData.data[i + 1] = BG_COLOR[1];
+      imgData.data[i + 2] = BG_COLOR[2];
+      imgData.data[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+  genEl.textContent = String(gen);
+};
+
+const renderGeneration = (gen: number) => {
+  if (currentVersion === 1) renderGenerationV1(gen);
+  else renderGenerationV2(gen);
+};
+
+// --- Playback ---
 
 const pause = () => {
   if (currentInterval) {
@@ -99,7 +144,24 @@ const play = (from: number) => {
   }, STEP_MS);
 };
 
-const startLife = async (imageIndex: number) => {
+// --- Image loading helper ---
+
+const loadAndSampleImage = async (imageIndex: number) => {
+  const padded = String(imageIndex).padStart(2, "0");
+  const img = await loadImage(
+    `/assets/images/machinic-desire-${padded}.png`,
+  );
+  const offscreen = document.createElement("canvas");
+  offscreen.width = GRID_SIZE;
+  offscreen.height = GRID_SIZE;
+  const offCtx = offscreen.getContext("2d")!;
+  offCtx.drawImage(img, 0, 0, GRID_SIZE, GRID_SIZE);
+  return offCtx.getImageData(0, 0, GRID_SIZE, GRID_SIZE);
+};
+
+// --- V1: Single Game of Life (alive/dead based on luminance) ---
+
+const startLifeV1 = async (imageIndex: number) => {
   const canvas = document.getElementById(
     "machinic-canvas",
   ) as HTMLCanvasElement;
@@ -109,24 +171,11 @@ const startLife = async (imageIndex: number) => {
   if (!canvas || !genEl || !maxGenEl || !scrubber) return;
 
   pause();
-
   ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  const padded = String(imageIndex).padStart(2, "0");
-  const img = await loadImage(
-    `/assets/images/machinic-desire-${padded}.png`,
-  );
+  const imageData = await loadAndSampleImage(imageIndex);
 
-  // Sample image at grid resolution
-  const offscreen = document.createElement("canvas");
-  offscreen.width = GRID_SIZE;
-  offscreen.height = GRID_SIZE;
-  const offCtx = offscreen.getContext("2d")!;
-  offCtx.drawImage(img, 0, 0, GRID_SIZE, GRID_SIZE);
-  const imageData = offCtx.getImageData(0, 0, GRID_SIZE, GRID_SIZE);
-
-  // Map each pixel to a color index and initialize Game of Life
   const colorIndices = new Uint8Array(GRID_SIZE * GRID_SIZE);
   const game = new GameOfLife(GRID_SIZE, GRID_SIZE);
 
@@ -138,15 +187,12 @@ const startLife = async (imageIndex: number) => {
       const b = imageData.data[i + 2];
       const ci = nearestColorIndex(r, g, b);
       const alive = luminance(r, g, b) > LUMINANCE_THRESHOLD;
-      // Sync color index with alive state so ci encodes alive/dead directly
       colorIndices[y * GRID_SIZE + x] =
         alive && ci < 2 ? ci + 2 : !alive && ci >= 2 ? ci - 2 : ci;
       game.setCell(x, y, alive);
     }
   }
 
-  // Pre-compute all generations as snapshots of color indices
-  // After syncing, ci >= 2 means alive, ci < 2 means dead
   snapshots = [new Uint8Array(colorIndices)];
 
   for (let gen = 0; gen < MAX_GENERATIONS; gen++) {
@@ -162,19 +208,121 @@ const startLife = async (imageIndex: number) => {
     snapshots.push(new Uint8Array(colorIndices));
   }
 
-  // Set canvas to grid size; CSS scales it up with pixelated rendering
   canvas.width = GRID_SIZE;
   canvas.height = GRID_SIZE;
 
-  // Setup scrubber
   scrubber.min = "0";
   scrubber.max = String(MAX_GENERATIONS);
   scrubber.value = "0";
   maxGenEl.textContent = String(MAX_GENERATIONS);
 
-  renderGeneration(0);
+  renderGenerationV1(0);
   play(0);
 };
+
+// --- V2: 4 independent Game of Life layers ---
+// Each palette color runs its own game. Dead cells are transparent.
+// Lightest color (index 3) is z-indexed on top, darkest (index 0) on bottom.
+
+const startLifeV2 = async (imageIndex: number) => {
+  const canvas = document.getElementById(
+    "machinic-canvas",
+  ) as HTMLCanvasElement;
+  genEl = document.getElementById("generation");
+  const maxGenEl = document.getElementById("max-generation");
+  scrubber = document.getElementById("scrubber") as HTMLInputElement;
+  if (!canvas || !genEl || !maxGenEl || !scrubber) return;
+
+  pause();
+  ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const imageData = await loadAndSampleImage(imageIndex);
+
+  // Create 4 independent Game of Life instances, one per palette color
+  const games: GameOfLife[] = [];
+  for (let c = 0; c < 4; c++) {
+    games.push(new GameOfLife(GRID_SIZE, GRID_SIZE));
+  }
+
+  // Classify each pixel to its nearest palette color and seed that color's game
+  for (let y = 0; y < GRID_SIZE; y++) {
+    for (let x = 0; x < GRID_SIZE; x++) {
+      const i = (y * GRID_SIZE + x) * 4;
+      const r = imageData.data[i];
+      const g = imageData.data[i + 1];
+      const b = imageData.data[i + 2];
+      const ci = nearestColorIndex(r, g, b);
+      games[ci].setCell(x, y, true);
+    }
+  }
+
+  // Pre-compute snapshots as bitmasks
+  // Each byte: bit c set means color c is alive at that position
+  const buildBitmask = (): Uint8Array => {
+    const mask = new Uint8Array(GRID_SIZE * GRID_SIZE);
+    for (let c = 0; c < 4; c++) {
+      games[c].forEach((x, y, alive) => {
+        if (alive) mask[y * GRID_SIZE + x] |= 1 << c;
+      });
+    }
+    return mask;
+  };
+
+  snapshots = [buildBitmask()];
+
+  for (let gen = 0; gen < MAX_GENERATIONS; gen++) {
+    for (let c = 0; c < 4; c++) games[c].step();
+    snapshots.push(buildBitmask());
+  }
+
+  canvas.width = GRID_SIZE;
+  canvas.height = GRID_SIZE;
+
+  scrubber.min = "0";
+  scrubber.max = String(MAX_GENERATIONS);
+  scrubber.value = "0";
+  maxGenEl.textContent = String(MAX_GENERATIONS);
+
+  renderGenerationV2(0);
+  play(0);
+};
+
+// --- Unified start ---
+
+const startLife = async (imageIndex: number) => {
+  currentImageIndex = imageIndex;
+  if (currentVersion === 1) await startLifeV1(imageIndex);
+  else await startLifeV2(imageIndex);
+};
+
+// --- Tabs ---
+
+const tabV1 = document.getElementById("tab-v1");
+const tabV2 = document.getElementById("tab-v2");
+const descV1 = document.getElementById("desc-v1");
+const descV2 = document.getElementById("desc-v2");
+
+const updateTabs = () => {
+  tabV1?.classList.toggle("md-tab-active", currentVersion === 1);
+  tabV2?.classList.toggle("md-tab-active", currentVersion === 2);
+  if (descV1) descV1.style.display = currentVersion === 1 ? "" : "none";
+  if (descV2) descV2.style.display = currentVersion === 2 ? "" : "none";
+};
+
+tabV1?.addEventListener("click", () => {
+  if (currentVersion === 1) return;
+  currentVersion = 1;
+  updateTabs();
+  startLife(currentImageIndex);
+});
+
+tabV2?.addEventListener("click", () => {
+  if (currentVersion === 2) return;
+  currentVersion = 2;
+  updateTabs();
+  startLife(currentImageIndex);
+});
 
 // Play/pause button
 const playPauseBtn = document.getElementById("play-pause");
