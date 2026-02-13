@@ -140,6 +140,14 @@ ol {
     color: #cccccc;
     width: 100%;
   }
+
+  & #image-selector {
+    width: 272px;
+    margin: 1rem auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
 
 .md-thumb {

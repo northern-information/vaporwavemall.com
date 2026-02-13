@@ -4,22 +4,20 @@ const GRID_SIZE = 150;
 const STEP_MS = 150;
 const IMAGE_COUNT = 16;
 
-function luminance(r: number, g: number, b: number): number {
-  return 0.299 * r + 0.587 * g + 0.114 * b;
-}
+const luminance = (r: number, g: number, b: number): number =>
+  0.299 * r + 0.587 * g + 0.114 * b;
 
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
+const loadImage = (src: string): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
     img.onerror = reject;
     img.src = src;
   });
-}
 
-function extractPalette(
+const extractPalette = (
   imageData: ImageData,
-): [number, number, number, number][] {
+): [number, number, number, number][] => {
   const colorCounts = new Map<
     string,
     { r: number; g: number; b: number; count: number }
@@ -45,14 +43,14 @@ function extractPalette(
     .slice(0, 4)
     .sort((a, b) => luminance(a.r, a.g, a.b) - luminance(b.r, b.g, b.b))
     .map((c) => [c.r, c.g, c.b, 255] as [number, number, number, number]);
-}
+};
 
-function nearestColorIndex(
+const nearestColorIndex = (
   r: number,
   g: number,
   b: number,
   palette: [number, number, number, number][],
-): number {
+): number => {
   let minDist = Infinity;
   let idx = 0;
   for (let i = 0; i < palette.length; i++) {
@@ -64,11 +62,11 @@ function nearestColorIndex(
     }
   }
   return idx;
-}
+};
 
 let currentInterval: ReturnType<typeof setInterval> | undefined;
 
-async function startLife(imageIndex: number) {
+const startLife = async (imageIndex: number) => {
   const canvas = document.getElementById(
     "machinic-canvas",
   ) as HTMLCanvasElement;
@@ -118,7 +116,7 @@ async function startLife(imageIndex: number) {
   canvas.width = GRID_SIZE;
   canvas.height = GRID_SIZE;
 
-  function render() {
+  const render = () => {
     const imgData = ctx.createImageData(GRID_SIZE, GRID_SIZE);
     game.forEach((x, y, alive) => {
       const ci = colorIndices[y * GRID_SIZE + x];
@@ -140,7 +138,7 @@ async function startLife(imageIndex: number) {
     });
     ctx.putImageData(imgData, 0, 0);
     genEl.textContent = String(game.getGeneration());
-  }
+  };
 
   render();
 
@@ -163,7 +161,7 @@ async function startLife(imageIndex: number) {
 
     render();
   }, STEP_MS);
-}
+};
 
 // Build thumbnail selector
 const selector = document.getElementById("image-selector");
