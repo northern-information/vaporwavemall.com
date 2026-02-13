@@ -1,12 +1,19 @@
 ---
 layout: base.liquid
 ---
-<main class="w-full px-4">
-  <div class="flex justify-center">
+<main class="md-layout">
+  <aside class="md-sidebar">
+    <div class="md-controls">
+      <button id="play-pause" class="md-play-pause" aria-label="Play/Pause">
+        <svg id="icon-play" viewBox="0 0 24 24" width="24" height="24"><polygon points="5,3 19,12 5,21"/></svg>
+        <svg id="icon-pause" viewBox="0 0 24 24" width="24" height="24" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+      </button>
+      <span class="font-mono md-gen">generation <span id="generation">0</span>/<span id="max-generation">0</span></span>
+    </div>
+    <input type="range" id="scrubber" min="0" max="0" value="0">
+    <div id="image-selector"></div>
+  </aside>
+  <div class="md-canvas-wrap">
     <canvas id="machinic-canvas"></canvas>
   </div>
-  <div class="flex justify-center">
-    <p class="text-center font-mono md-gen">generation <span id="generation">0</span></p>
-  </div>
-  <div id="image-selector"></div>
 </main>
