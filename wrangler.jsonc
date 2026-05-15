@@ -1,3 +1,20 @@
 {
-  "compatibility_date": "2026-02-12"
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "vaporwavemall-com",
+  "compatibility_date": "2026-05-14",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "vaporwavemall.com/*",
+      "zone_name": "vaporwavemall.com"
+    }
+  ]
 }
