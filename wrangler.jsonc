@@ -15,6 +15,10 @@
     {
       "pattern": "vaporwavemall.com/*",
       "zone_name": "vaporwavemall.com"
+    },
+    {
+      "pattern": "www.vaporwavemall.com/*",
+      "zone_name": "vaporwavemall.com"
     }
   ]
 }
