@@ -4,4 +4,4 @@ node_modules
 .claude
 .sass-cache
 src/assets/javascript
-src/assets/stylesheets/style.built.css
+src/assets/stylesheets/style.built.css.wrangler
