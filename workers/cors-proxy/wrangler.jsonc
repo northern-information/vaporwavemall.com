@@ -1,0 +1,22 @@
+{
+  // Generalized CORS proxy, deployed alongside the vaporwavemall.com site
+  // Worker by .github/workflows/deploy.yml. Served at its own subdomain.
+  "name": "cors-proxy",
+  "main": "worker.js",
+  "compatibility_date": "2026-05-14",
+  "observability": {
+    "enabled": true
+  },
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "cors-proxy.vaporwavemall.com",
+      "custom_domain": true
+    }
+  ]
+
+  // Optional: restrict which browser origins may READ proxied responses.
+  // Unset means any origin ("*"). Not authentication — anyone can still call
+  // the Worker directly; this only governs browser CORS.
+  // "vars": { "ALLOWED_ORIGINS": "https://forgotten-industries.net" }
+}

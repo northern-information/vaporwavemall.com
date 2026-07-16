@@ -25,8 +25,16 @@ jobs:
 
       - run: npm run build
 
-      - uses: cloudflare/wrangler-action@v4
+      - name: Deploy site
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           wranglerVersion: "4.92.0"
           command: deploy
+
+      - name: Deploy cors-proxy worker
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          wranglerVersion: "4.92.0"
+          command: deploy --config workers/cors-proxy/wrangler.jsonc
