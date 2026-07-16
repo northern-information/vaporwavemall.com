@@ -2,7 +2,7 @@
   // Generalized CORS proxy, deployed alongside the vaporwavemall.com site
   // Worker by .github/workflows/deploy.yml. Served at its own subdomain.
   "name": "cors-proxy",
-  "main": "worker.js",
+  "main": "worker.ts",
   "compatibility_date": "2026-05-14",
   "observability": {
     "enabled": true

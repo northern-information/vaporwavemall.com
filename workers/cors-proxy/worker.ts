@@ -13,10 +13,15 @@
 //
 // First consumer: CxR, the research instrument at forgotten-industries.net/cxr.
 
+export interface Env {
+  /** Comma-separated browser origins allowed to read responses. Unset = "*". */
+  ALLOWED_ORIGINS?: string
+}
+
 const PROXY_METHODS = new Set(['GET', 'HEAD'])
 
 export default {
-  async fetch(request, env) {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const origin = request.headers.get('Origin')
     const allowOrigin = resolveAllowOrigin(origin, env)
 
@@ -37,7 +42,7 @@ export default {
       return json({ error: 'Missing required ?url= parameter.' }, 400, allowOrigin)
     }
 
-    let targetUrl
+    let targetUrl: URL
     try {
       targetUrl = new URL(target)
     } catch {
@@ -50,7 +55,7 @@ export default {
       return json({ error: 'Target host is not allowed.' }, 403, allowOrigin)
     }
 
-    let upstream
+    let upstream: Response
     try {
       upstream = await fetch(targetUrl.toString(), {
         method: request.method,
@@ -61,7 +66,8 @@ export default {
         redirect: 'follow',
       })
     } catch (err) {
-      return json({ error: `Upstream fetch failed: ${err.message}` }, 502, allowOrigin)
+      const message = err instanceof Error ? err.message : String(err)
+      return json({ error: `Upstream fetch failed: ${message}` }, 502, allowOrigin)
     }
 
     // Re-serve the upstream body with CORS headers. Preserve status and
@@ -77,22 +83,22 @@ export default {
       headers,
     })
   },
-}
+} satisfies ExportedHandler<Env>
 
 // Resolve the Access-Control-Allow-Origin value:
 //   - ALLOWED_ORIGINS unset  -> "*" (open proxy)
 //   - set + request Origin in the list -> echo that Origin
 //   - set + Origin missing (non-browser caller) -> "*" (CORS is irrelevant)
 //   - set + Origin not in the list -> null (deny)
-function resolveAllowOrigin(origin, env) {
-  const configured = env && env.ALLOWED_ORIGINS
+function resolveAllowOrigin(origin: string | null, env: Env): string | null {
+  const configured = env.ALLOWED_ORIGINS
   if (!configured) return '*'
   const allowed = configured.split(',').map((s) => s.trim()).filter(Boolean)
   if (!origin) return '*'
   return allowed.includes(origin) ? origin : null
 }
 
-function corsHeaders(allowOrigin) {
+function corsHeaders(allowOrigin: string): Headers {
   return new Headers({
     'access-control-allow-origin': allowOrigin,
     'access-control-allow-methods': 'GET,HEAD,OPTIONS',
@@ -102,13 +108,13 @@ function corsHeaders(allowOrigin) {
   })
 }
 
-function json(body, status, allowOrigin) {
+function json(body: unknown, status: number, allowOrigin: string): Response {
   const headers = corsHeaders(allowOrigin)
   headers.set('content-type', 'application/json')
   return new Response(JSON.stringify(body), { status, headers })
 }
 
-function deny(origin) {
+function deny(origin: string | null): Response {
   return new Response(
     JSON.stringify({ error: `Origin not allowed: ${origin || '(none)'}` }),
     { status: 403, headers: { 'content-type': 'application/json' } }
@@ -118,7 +124,7 @@ function deny(origin) {
 // Block obvious internal / metadata targets to limit SSRF abuse. Workers run on
 // Cloudflare's edge and cannot reach a private LAN, but this still refuses
 // loopback, private, and link-local (cloud metadata) hosts.
-function isBlockedHost(hostname) {
+function isBlockedHost(hostname: string): boolean {
   const host = hostname.toLowerCase()
   if (host === 'localhost' || host.endsWith('.localhost')) return true
   if (host === '::1' || host === '0.0.0.0') return true
