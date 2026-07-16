@@ -27,6 +27,12 @@ wrangler deploy --config workers/cors-proxy/wrangler.jsonc
 The route `cors-proxy.vaporwavemall.com` (custom domain) is provisioned on the
 vaporwavemall.com zone. To run locally: `npx wrangler dev --config workers/cors-proxy/wrangler.jsonc`.
 
+## Tests
+
+`worker.test.ts` covers the handler with Vitest (preflight, method/URL guards,
+SSRF blocks, successful proxying with header pass-through, upstream failure, and
+the `ALLOWED_ORIGINS` allowlist). Run `npm test`; CI runs it before deploying.
+
 ## Security
 
 Open proxy by default (`ACAO: *`, any target). SSRF-guarded (refuses
