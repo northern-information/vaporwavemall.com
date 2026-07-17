@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0",
-    "@cloudflare/workers-types": "^5.20260716.1",
+    "@cloudflare/workers-types": "^4.20260702.1",
     "@shopify/prettier-plugin-liquid": "^1.9.3",
     "@tailwindcss/cli": "^4.0.0",
     "prettier": "^3.6.2",
