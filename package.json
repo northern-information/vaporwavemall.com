@@ -12,17 +12,17 @@
     "discography": "npm install @tyleretters/discography@latest && cp ./node_modules/@tyleretters/discography/dist/discography.yml src/data/discography.yml"
   },
   "dependencies": {
-    "@tyleretters/discography": "^1.0.3"
+    "@tyleretters/discography": "4.0.2"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^3.0.0",
-    "@cloudflare/workers-types": "^5.20260716.1",
-    "@shopify/prettier-plugin-liquid": "^1.9.3",
-    "@tailwindcss/cli": "^4.0.0",
-    "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.6.14",
-    "typescript": "^5.7.0",
-    "vitest": "^4.1.12",
-    "wrangler": "^4.157.0"
+    "@11ty/eleventy": "3.1.8",
+    "@cloudflare/workers-types": "5.20261106.1",
+    "@shopify/prettier-plugin-liquid": "1.11.4",
+    "@tailwindcss/cli": "4.3.5",
+    "prettier": "3.9.10",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0",
+    "wrangler": "4.158.0"
   }
 }
