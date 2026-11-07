@@ -9,7 +9,7 @@
     "build": "npm run build:ts && npm run build:css && npx @11ty/eleventy",
     "test": "vitest run",
     "pretty": "prettier --write .",
-    "discography": "npm install @tyleretters/discography@latest && cp ./node_modules/@tyleretters/discography/dist/discography.yml src/data/discography.yml"
+    "discography": "npm install --save-exact @tyleretters/discography@latest && cp ./node_modules/@tyleretters/discography/dist/discography.toml src/data/discography.toml"
   },
   "dependencies": {
     "@tyleretters/discography": "4.0.2"
